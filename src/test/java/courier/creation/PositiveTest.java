@@ -1,6 +1,7 @@
 package courier.creation;
 
 import app.BaseTest;
+import params.CourierApi;
 import params.CreateCourier;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
@@ -11,7 +12,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import static io.restassured.RestAssured.given;
+
+import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 @RunWith(Parameterized.class)
@@ -19,7 +21,7 @@ public class PositiveTest extends BaseTest {
     private String login;
     private String password;
     private String firstName;
-    private String hand = "/api/v1/courier";
+
 
     public PositiveTest(String login, String password, String firstName) {
         this.login = login;
@@ -43,33 +45,16 @@ public class PositiveTest extends BaseTest {
     @Step("Регистрация")
     public Response signIn() {
         CreateCourier courier = new CreateCourier(login, password, firstName);
-        Response response =
-                given()
-                        .header("Content-type", "application/json")
-                        .and()
-                        .body(courier)
-                        .post(hand);
+        Response response = CourierApi.createCourier(courier);
         return response;
-    }
-
-    @Step("Проверка сообщения ok: true")
-    public void checkMessage(Response response) {
-        response
-                .then().assertThat().body("ok", equalTo(true));
-    }
-
-    @Step("Проверка кода ответа Успешное создание учетной записи")
-    public void checkStatusCode(Response response) {
-        response
-                .then().assertThat().statusCode(201);
     }
 
     @Test
     @DisplayName("Создание курьера")
     public void createPositiveTest() {
         Response response = signIn();
-        checkStatusCode(response);
-        checkMessage(response);
+        response
+                .then().assertThat().statusCode(SC_CREATED).body("ok", equalTo(true));
     }
 
     @After
@@ -77,4 +62,3 @@ public class PositiveTest extends BaseTest {
         deleteTestCourier(login, password);
     }
 }
-

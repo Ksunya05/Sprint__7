@@ -1,6 +1,8 @@
 package courier.login;
 
 import app.BaseTest;
+import params.CourierApi;
+import params.CreateCourier;
 import params.LoginCourier;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
@@ -11,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 @RunWith(Parameterized.class)
@@ -20,7 +21,6 @@ public class NegativeTest extends BaseTest {
     private String password;
     private int code;
     private String message;
-    private String hand = "/api/v1/courier/login";
 
     public NegativeTest(String login, String password, int code, String message) {
         this.login = login;
@@ -43,39 +43,22 @@ public class NegativeTest extends BaseTest {
     @Before
     public void setUp() {
         baseTestURL();
-        createTestCourier("magic", "4567", "one");
+        CourierApi.createCourier(new CreateCourier("magic", "4567", "one"));
     }
 
     @Step("Отправка логина с некорректными данными")
     public Response login() {
         LoginCourier courier = new LoginCourier(login, password);
-        Response response =
-                given()
-                        .header("Content-type", "application/json")
-                        .and()
-                        .body(courier)
-                        .post(hand);
+        Response response = CourierApi.loginCourier(courier);
         return response;
-    }
-
-    @Step("Проверка сообщения об ошибке")
-    public void checkMessage(Response response) {
-        response
-                .then().assertThat().body("message", equalTo(message));
-    }
-
-    @Step("Проверка кода ошибки")
-    public void checkStatusCode(Response response) {
-        response
-                .then().assertThat().statusCode(code);
     }
 
     @Test
     @DisplayName("Логин курьера - негативный кейс")
     public void testNegativeLoginCase() {
         Response response = login();
-        checkStatusCode(response);
-        checkMessage(response);
+        response
+                .then().assertThat().statusCode(code).body("message", equalTo(message));
     }
 
     @After

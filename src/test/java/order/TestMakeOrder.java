@@ -1,20 +1,21 @@
 package order;
 
+import app.BaseTest;
 import params.MakeOrder;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import params.OrderApi;
 
-import static io.restassured.RestAssured.given;
+import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 @RunWith(Parameterized.class)
-public class TestMakeOrder {
+public class TestMakeOrder extends BaseTest {
     private String firstName;
     private String lastName;
     private String address;
@@ -24,7 +25,6 @@ public class TestMakeOrder {
     private String deliveryDate;
     private String comment;
     private String[] color;
-    private String hand = "/api/v1/orders";
 
     public TestMakeOrder(String lastName, String address, String firstName, int metroStation, String phone, int rentTime, String comment, String deliveryDate, String[] color) {
         this.lastName = lastName;
@@ -54,38 +54,22 @@ public class TestMakeOrder {
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/";
+        baseTestURL();
 
     }
 
     @Step("Отправка параметров для создания заказа")
-    public Response makeOrder() {
-        MakeOrder makeOrder = new MakeOrder(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color);
-        Response response =
-                given()
-                        .body(makeOrder)
-                        .post(hand);
+    public Response makeOrders() {
+        MakeOrder order = new MakeOrder(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color);
+        Response response = OrderApi.makeOrder(order);
         return response;
-    }
-
-    @Step("Проверка track в теле ответа")
-    public void checkWordTrack(Response response) {
-        response
-                .then().assertThat().body("track", notNullValue());
-    }
-
-    @Step("Проверка кода ответа - Успешное создание заказа")
-    public void checkStatusCode(Response response) {
-        response
-                .then().assertThat().statusCode(201);
     }
 
     @Test
     @DisplayName("Проверка создания заказа")
     public void testMakeOrder() {
-        Response response = makeOrder();
-        checkStatusCode(response);
-        checkWordTrack(response);
-
+        Response response = makeOrders();
+        response
+                .then().assertThat().statusCode(SC_CREATED).body("track", notNullValue());
     }
 }

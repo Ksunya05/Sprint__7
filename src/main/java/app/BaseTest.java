@@ -1,11 +1,10 @@
 package app;
-
 import params.CreateCourier;
 import params.LoginCourier;
 import io.restassured.RestAssured;
 
 import static io.restassured.RestAssured.given;
-
+import static org.apache.http.HttpStatus.*;
 public class BaseTest {
     public void baseTestURL() {
         RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/";
@@ -33,7 +32,7 @@ public class BaseTest {
                 .path("id");
         given()
                 .delete("/api/v1/courier/{id}", id)
-                .then().assertThat().statusCode(200);
+                .then().assertThat().statusCode(SC_OK);
 
     }
 }

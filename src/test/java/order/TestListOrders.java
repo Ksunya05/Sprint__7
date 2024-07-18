@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
-
+import static org.apache.http.HttpStatus.*;
 public class TestListOrders extends BaseTest {
     public String hand = "/api/v1/orders";
 
@@ -25,17 +25,11 @@ public class TestListOrders extends BaseTest {
         return response;
     }
 
-    @Step("Проверка кода ответа")
-    public void checkStatusCode(Response response) {
-        response
-                .then().statusCode(200);
-
-    }
-
     @Test
     @DisplayName("Проверка получения списка заказов")
     public void testListOrders() {
         Response response = listOrders();
-        checkStatusCode(response);
+        response
+                .then().statusCode(SC_OK);
     }
 }
