@@ -18,7 +18,7 @@ public class PositiveTest extends BaseTest {
     @Before
     public void setUp() {
         baseTestURL();
-        createTestCourier("magic", "4567", "one");
+        CourierApi.createTestCourier("magic", "4567", "one");
     }
 
     @Step("Авторизация курьера")
@@ -38,7 +38,7 @@ public class PositiveTest extends BaseTest {
 
     @After
     public void deleteCourier() {
-        deleteTestCourier("magic", "4567");
+        CourierApi.deleteTestCourier("magic", "4567");
     }
 }
 

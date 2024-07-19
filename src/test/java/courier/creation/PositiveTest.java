@@ -59,6 +59,6 @@ public class PositiveTest extends BaseTest {
 
     @After
     public void deleteCourier() {
-        deleteTestCourier(login, password);
+        CourierApi.deleteTestCourier(login, password);
     }
 }

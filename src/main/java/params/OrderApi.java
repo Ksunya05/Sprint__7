@@ -13,4 +13,11 @@ public class OrderApi {
                 .post(hand_order);
 
     }
+
+    public static Response listOrders() {
+
+        return given()
+                .get(hand_order);
+
+    }
 }

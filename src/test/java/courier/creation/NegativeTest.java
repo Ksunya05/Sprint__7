@@ -66,6 +66,6 @@ public class NegativeTest extends BaseTest {
     @After
     public void deleteCourier() {
 
-        deleteTestCourier("cinderella", "1234");
+        CourierApi.deleteTestCourier("cinderella", "1234");
     }
 }
